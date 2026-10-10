@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>段码屏教学 · 0~9二进制与十进制</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+        }
+        body {
+            background: #1a1e26;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .main-panel {
+            background: #0f1218;
+            border-radius: 3rem 3rem 2rem 2rem;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7), inset 0 0 10px #2d3440;
+            padding: 30px 40px 40px;
+            border: 2px solid #3e4a5b;
+            max-width: 1000px;
+            width: fit-content;
+        }
+        .title {
+            text-align: center;
+            color: #aab9d4;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 3px black;
+        }
+        .display-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 50px;
+            margin: 30px 0 30px;
+        }
+        /* 段码屏模块 */
+        .segment-module {
+            background: #0b0d11;
+            border-radius: 2rem;
+            padding: 25px 20px 20px;
+            box-shadow: inset 0 0 20px #000000, 0 10px 15px #0000004d;
+            border: 1px solid #3b4658;
+        }
+        .segment-display {
+            position: relative;
+            width: 220px;
+            height: 300px;
+            margin: 0 auto;
+            background: #171c24;
+            border-radius: 30px;
+            padding: 15px;
+            box-shadow: inset 0 0 25px #000000, 0 0 0 2px #242b36;
+        }
+        .digit-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .seg {
+            position: absolute;
+            background-color: #2b313b;
+            border-radius: 12px;
+            transition: background-color 0.1s ease, box-shadow 0.1s ease;
+            box-shadow: inset 0 0 8px #000000, 0 0 0 1px #1f232b;
+        }
+        /* 水平段 a, g, d */
+        .seg-a, .seg-g, .seg-d {
+            width: 70px;
+            height: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .seg-a { top: 15px; }
+        .seg-g { top: 130px; }
+        .seg-d { bottom: 15px; }
+
+        /* 垂直段 f, b, e, c */
+        .seg-f, .seg-b, .seg-e, .seg-c {
+            width: 20px;
+            height: 70px;
+        }
+        .seg-f { top: 35px; left: 15px; }
+        .seg-b { top: 35px; right: 15px; }
+        .seg-e { bottom: 35px; left: 15px; }
+        .seg-c { bottom: 35px; right: 15px; }
+
+        /* 小数点 h */
+        .seg-h {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            bottom: 15px;
+            right: 15px;
+            background-color: #2b313b;
+            box-shadow: inset 0 0 8px #000000, 0 0 0 1px #1f232b;
+        }
+
+        /* 点亮状态 */
+        .seg.lit {
+            background-color: #ff3b3b;
+            box-shadow: 0 0 15px #ff5e5e, 0 0 30px #ff0000, inset 0 0 5px white;
+        }
+        .seg-h.lit {
+            background-color: #ff3b3b;
+            box-shadow: 0 0 15px #ff5e5e, 0 0 30px #ff0000, inset 0 0 5px white;
+        }
+
+        /* 小灯面板 */
+        .led-panel {
+            background: #11161e;
+            border-radius: 2rem;
+            padding: 25px 25px 20px;
+            border: 1px solid #3b4658;
+            box-shadow: inset 0 0 10px #000000, 0 10px 15px #0000004d;
+        }
+        .led-title {
+            color: #9aaec9;
+            text-align: center;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        .led-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            justify-items: center;
+            align-items: center;
+        }
+        .led-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .led {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #232a33;
+            box-shadow: inset 0 0 12px #000000, 0 0 0 2px #2b3541;
+            transition: background 0.1s, box-shadow 0.1s;
+        }
+        .led.lit {
+            background: #ff4d4d;
+            box-shadow: 0 0 20px #ff3b3b, 0 0 35px #ff0000, inset 0 0 8px #ffeeee;
+        }
+        .led-label {
+            color: #9aaec9;
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            background: #1d232d;
+            padding: 2px 10px;
+            border-radius: 30px;
+            border: 1px solid #394555;
+            box-shadow: inset 0 1px 3px black;
+        }
+
+        /* 输出信息区 */
+        .info-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 50px;
+            background: #0a0e13;
+            border-radius: 4rem;
+            padding: 20px 50px;
+            margin-top: 20px;
+            border: 1px solid #334052;
+            box-shadow: inset 0 0 15px #000000;
+        }
+        .info-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .info-label {
+            color: #9bb0cc;
+            font-size: 1.1rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        .binary-box {
+            background: #1d242e;
+            border-radius: 2rem;
+            padding: 10px 24px;
+            border: 1px solid #3a4a5e;
+            box-shadow: inset 0 0 10px black;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #c6e0ff;
+            letter-spacing: 6px;
+            text-shadow: 0 0 5px #3d8cff;
+        }
+        .decimal-box {
+            background: #1d242e;
+            border-radius: 2rem;
+            padding: 10px 30px;
+            border: 1px solid #3a4a5e;
+            box-shadow: inset 0 0 10px black;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #ffd966;
+            text-shadow: 0 0 12px #ffb300;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .footnote {
+            color: #556b8a;
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 850px) {
+            .display-row {
+                gap: 30px;
+            }
+            .info-area {
+                gap: 20px;
+                padding: 20px 20px;
+            }
+            .binary-box {
+                font-size: 1.2rem;
+                letter-spacing: 3px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-panel">
+    <div class="title">⚡ 段码屏 · 数字 0 ~ 9 ⚡</div>
+    <div class="display-row">
+        <!-- 段码屏 -->
+        <div class="segment-module">
+            <div class="segment-display">
+                <div class="digit-container" id="digitContainer">
+                    <!-- 段 a ~ g, 小数点 h -->
+                    <div class="seg seg-a" id="seg-a"></div>
+                    <div class="seg seg-b" id="seg-b"></div>
+                    <div class="seg seg-c" id="seg-c"></div>
+                    <div class="seg seg-d" id="seg-d"></div>
+                    <div class="seg seg-e" id="seg-e"></div>
+                    <div class="seg seg-f" id="seg-f"></div>
+                    <div class="seg seg-g" id="seg-g"></div>
+                    <div class="seg seg-h" id="seg-h"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 小灯区域 -->
+        <div class="led-panel">
+            <div class="led-title">段码小灯 a ~ h</div>
+            <div class="led-grid" id="ledGrid">
+                <!-- 由JS动态生成或直接写静态，便于更新：这里用静态方便控制ID -->
+                <div class="led-item"><div class="led" id="led-a"></div><span class="led-label">a</span></div>
+                <div class="led-item"><div class="led" id="led-b"></div><span class="led-label">b</span></div>
+                <div class="led-item"><div class="led" id="led-c"></div><span class="led-label">c</span></div>
+                <div class="led-item"><div class="led" id="led-d"></div><span class="led-label">d</span></div>
+                <div class="led-item"><div class="led" id="led-e"></div><span class="led-label">e</span></div>
+                <div class="led-item"><div class="led" id="led-f"></div><span class="led-label">f</span></div>
+                <div class="led-item"><div class="led" id="led-g"></div><span class="led-label">g</span></div>
+                <div class="led-item"><div class="led" id="led-h"></div><span class="led-label">h</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 二进制与十进制输出 -->
+    <div class="info-area">
+        <div class="info-block">
+            <span class="info-label">二进制 (h g f e d c b a)</span>
+            <div class="binary-box" id="binaryDisplay">0000 0000</div>
+        </div>
+        <div class="info-block">
+            <span class="info-label">十进制</span>
+            <div class="decimal-box" id="decimalDisplay">0</div>
+        </div>
+    </div>
+    <div class="footnote">a~g 组成数字8，h为小数点 · 1 = 亮 · 0 = 灭</div>
+</div>
+
+<script>
+    (function() {
+        // 段映射：根据数字0~9，哪些段亮 (a,b,c,d,e,f,g,h)
+        // 标准7段数码管+小数点，这里h通常不亮(0)显示数字，但是我们按需求：只显示0~9时小数点h不亮。
+        // 段顺序固定：a, b, c, d, e, f, g, h
+        const digitSegments = {
+            0: ['a', 'b', 'c', 'd', 'e', 'f'],          // 0: a,b,c,d,e,f 亮, g灭, h灭
+            1: ['b', 'c'],                              // 1
+            2: ['a', 'b', 'g', 'e', 'd'],               // 2
+            3: ['a', 'b', 'g', 'c', 'd'],               // 3
+            4: ['f', 'g', 'b', 'c'],                    // 4
+            5: ['a', 'f', 'g', 'c', 'd'],               // 5
+            6: ['a', 'f', 'g', 'e', 'c', 'd'],          // 6
+            7: ['a', 'b', 'c'],                         // 7
+            8: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],     // 8 全亮(除小数点)
+            9: ['a', 'b', 'c', 'd', 'f', 'g']           // 9
+        };
+
+        // 映射段字母到索引 0~7: a=0, b=1, c=2, d=3, e=4, f=5, g=6, h=7
+        const segIndexMap = {
+            'a': 0, 'b': 1, 'c': 2, 'd': 3,
+            'e': 4, 'f': 5, 'g': 6, 'h': 7
+        };
+
+        // 反向：索引到字母
+        const indexToSeg = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+        // DOM 元素
+        const segElements = {
+            a: document.getElementById('seg-a'),
+            b: document.getElementById('seg-b'),
+            c: document.getElementById('seg-c'),
+            d: document.getElementById('seg-d'),
+            e: document.getElementById('seg-e'),
+            f: document.getElementById('seg-f'),
+            g: document.getElementById('seg-g'),
+            h: document.getElementById('seg-h')
+        };
+
+        const ledElements = {
+            a: document.getElementById('led-a'),
+            b: document.getElementById('led-b'),
+            c: document.getElementById('led-c'),
+            d: document.getElementById('led-d'),
+            e: document.getElementById('led-e'),
+            f: document.getElementById('led-f'),
+            g: document.getElementById('led-g'),
+            h: document.getElementById('led-h')
+        };
+
+        const binaryDisplay = document.getElementById('binaryDisplay');
+        const decimalDisplay = document.getElementById('decimalDisplay');
+
+        // 辅助：根据亮的段数组，更新段码屏和小灯，并计算二进制/十进制
+        function updateDisplayFromLitSegments(litSegmentsArray) {
+            // 先全部熄灭
+            for (let letter of indexToSeg) {
+                segElements[letter].classList.remove('lit');
+                ledElements[letter].classList.remove('lit');
+            }
+
+            // 点亮指定的段
+            for (let segLetter of litSegmentsArray) {
+                if (segElements[segLetter]) {
+                    segElements[segLetter].classList.add('lit');
+                    ledElements[segLetter].classList.add('lit');
+                }
+            }
+
+            // 构建8位二进制数组: 顺序 h g f e d c b a (索引0 = h, 1=g, 2=f, 3=e, 4=d, 5=c, 6=b, 7=a)
+            // 但我们的段顺序字母 a~h 对应二进制的低位到高位？通常段码数据习惯：a是最低位(bit0)或最高位？
+            // 但展示上显示 "h g f e d c b a" 从高到低，那么a是最低bit。便于展示，我们构建二进制字符串：
+            // 二进制显示: 最高位(h) ... 最低位(a)
+            const bitArray = new Array(8).fill(0); // 索引0对应h, 1:g, 2:f, 3:e, 4:d, 5:c, 6:b, 7:a
+            // 填充: 例如段'a'亮 -> bitArray[7] = 1 ; 'h'亮 -> bitArray[0] = 1
+            for (let segLetter of litSegmentsArray) {
+                const idx = segIndexMap[segLetter]; // a=0, b=1 ... h=7
+                // 对应到bitArray位置: a(0) -> 数组索引7, b(1)->6, c(2)->5, d(3)->4, e(4)->3, f(5)->2, g(6)->1, h(7)->0
+                const bitPos = 7 - idx;
+                bitArray[bitPos] = 1;
+            }
+            // 构建二进制字符串 (每4位加空格? 简单显示8位)
+            let binaryStr = bitArray.join('');
+            // 插入空格: 前4位 后4位
+            binaryStr = binaryStr.slice(0, 4) + ' ' + binaryStr.slice(4);
+            binaryDisplay.textContent = binaryStr;
+
+            // 计算十进制值：bitArray 下标0是最高位(h) 权重 2^7 ... 下标7是a 权重 2^0
+            let decimalValue = 0;
+            for (let i = 0; i < 8; i++) {
+                if (bitArray[i] === 1) {
+                    decimalValue += Math.pow(2, 7 - i);
+                }
+            }
+            decimalDisplay.textContent = decimalValue;
+        }
+
+        // 根据数字0~9获取亮段数组，默认h不亮
+        function getLitSegmentsForDigit(digit) {
+            if (digitSegments[digit]) {
+                return digitSegments[digit];
+            }
+            return []; // 默认
+        }
+
+        // 当前展示的数字索引
+        let currentDigit = 0;
+
+        // 更新到指定数字
+        function showDigit(digit) {
+            const litSegments = getLitSegmentsForDigit(digit);
+            updateDisplayFromLitSegments(litSegments);
+        }
+
+        // 启动循环: 0 -> 1 -> ... -> 9 -> 0 ...
+        function startAnimation() {
+            // 先显示0
+            showDigit(0);
+
+            // 每1秒递增
+            setInterval(() => {
+                currentDigit = (currentDigit + 1) % 10; // 0~9循环
+                showDigit(currentDigit);
+            }, 1000);
+        }
+
+        // 页面加载后启动
+        window.addEventListener('load', () => {
+            // 稍微延迟一点点确保DOM稳定, 然后开始
+            startAnimation();
+        });
+
+        // 备注：由于h小数点不参与数字显示，所以段h永远不亮，其对应的led和二进制最高位始终为0。
+        // 但为了教学展示，如果想让小数点h也亮起可以修改，但需求是“段码屏由数字8和小数点显现（如果全亮）”，
+        // 数字0~9通常不亮小数点，因此我们的实现完全符合。
+        // 二进制展示的十进制值会是常见的共阴段码值？但根据a~h顺序不同会有差异，但此处纯粹从亮灭计算二进制，符合教学。
+    })();
+</script>
+</body>
+</html>
